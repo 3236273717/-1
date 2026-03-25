@@ -22,48 +22,19 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y git curl python3-pip python3-dev build-essential libssl-dev libffi-dev libxml2-dev libxslt1-dev zlib1g-dev openjdk-11-jdk wget unzip
+        sudo apt install -y git curl python3-pip python3-dev build-essential libssl-dev libffi-dev libxml2-dev libxslt1-dev zlib1g-dev openjdk-11-jdk wget unzip autoconf libtool pkg-config
     
     - name: Install Python dependencies
       run: |
         pip install --upgrade pip
         pip install buildozer cython
     
-    - name: Set up Android SDK
-      run: |
-        # Create buildozer Android SDK directory structure
-        mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-        mkdir -p ~/.buildozer/android/platform/android-sdk/build-tools
-        mkdir -p ~/.buildozer/android/platform/android-sdk/platforms
-        
-        # Download Android SDK Command Line Tools
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O sdk-tools.zip
-        unzip -q sdk-tools.zip
-        mv cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/
-        rm -rf cmdline-tools sdk-tools.zip
-        
-        # Set environment variables
-        export ANDROID_HOME=~/.buildozer/android/platform/android-sdk
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/31.0.0
-        
-        # Accept licenses and install required components
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
-        
-        # Verify installation
-        echo "=== Checking build-tools directory ==="
-        ls -la $ANDROID_HOME/build-tools/
-        ls -la $ANDROID_HOME/build-tools/31.0.0/ || echo "build-tools/31.0.0 not found"
-        echo "=== Checking aidl ==="
-        find $ANDROID_HOME -name "aidl" 2>/dev/null || echo "aidl not found"
-        echo "ANDROID_HOME=$ANDROID_HOME"
-        echo "PATH=$PATH"
-    
     - name: Build APK
       run: |
-        export ANDROID_HOME=~/.buildozer/android/platform/android-sdk
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/31.0.0
+        # Let buildozer automatically download and setup Android SDK
         buildozer android debug
+      env:
+        ANDROID_HOME: ''
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
