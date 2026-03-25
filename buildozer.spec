@@ -39,7 +39,7 @@ version = 0.1
 requirements = python3,kivy
 
 # (bool) Use Docker to build the app
-use_docker = True
+use_docker = False
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

@@ -29,42 +29,8 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython
     
-    - name: Setup Android SDK for buildozer
-      run: |
-        # Create the exact directory structure buildozer expects
-        SDK_DIR="$HOME/.buildozer/android/platform/android-sdk"
-        mkdir -p "$SDK_DIR"
-        
-        # Download command line tools
-        cd /tmp
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
-        unzip -q commandlinetools-linux-10406996_latest.zip
-        
-        # Install to SDK directory
-        mkdir -p "$SDK_DIR/cmdline-tools/latest"
-        mv cmdline-tools/* "$SDK_DIR/cmdline-tools/latest/"
-        rm -rf cmdline-tools commandlinetools-linux-10406996_latest.zip
-        
-        # Set up environment
-        export ANDROID_HOME="$SDK_DIR"
-        export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
-        
-        # Accept licenses
-        yes | sdkmanager --licenses
-        
-        # Install required packages
-        sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
-        
-        # Verify installation
-        echo "SDK Directory: $SDK_DIR"
-        ls -la "$SDK_DIR"
-        ls -la "$SDK_DIR/build-tools/" || echo "build-tools not found"
-        which aidl || echo "aidl not in PATH"
-    
     - name: Build APK
       run: |
-        export ANDROID_HOME="$HOME/.buildozer/android/platform/android-sdk"
-        export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/31.0.0"
         buildozer android debug
     
     - name: Upload APK
