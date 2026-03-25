@@ -41,16 +41,22 @@ jobs:
         rm -rf cmdline-tools sdk-tools.zip
         
         # Set environment variables
-        echo "ANDROID_HOME=~/Android/Sdk" >> ~/.bashrc
-        echo "PATH=\$PATH:\$ANDROID_HOME/cmdline-tools/latest/bin:\$ANDROID_HOME/platform-tools" >> ~/.bashrc
-        source ~/.bashrc
+        export ANDROID_HOME=~/Android/Sdk
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/31.0.0
         
         # Accept licenses and install required components
-        yes | ~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-        ~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
+        
+        # Verify installation
+        ls -la $ANDROID_HOME/build-tools/31.0.0/
+        echo "ANDROID_HOME=$ANDROID_HOME"
+        echo "PATH=$PATH"
     
     - name: Build APK
       run: |
+        export ANDROID_HOME=~/Android/Sdk
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/31.0.0
         buildozer android debug
     
     - name: Upload APK
